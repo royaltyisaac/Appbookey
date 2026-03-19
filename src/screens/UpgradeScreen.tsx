@@ -8,25 +8,23 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useUserStore } from '../src/stores/userStore';
-import { TIER_CONFIG } from '../src/constants/tiers';
-import { Colors, Spacing, FontSizes, BorderRadius } from '../src/constants/theme';
+import { useNavigation } from '../navigation/NavigationContext';
+import { useUserStore } from '../stores/userStore';
+import { TIER_CONFIG } from '../constants/tiers';
+import { Colors, Spacing, FontSizes, BorderRadius } from '../constants/theme';
 
 export default function UpgradeScreen() {
-  const router = useRouter();
+  const { goBack } = useNavigation();
   const { tier, setTier } = useUserStore();
 
   const handleUpgrade = async () => {
-    // In production, this would handle payment via IAP
-    // For now, we toggle the tier for demonstration
     await setTier('pro');
     if (Platform.OS === 'web') {
       window.alert('Upgraded to Pro! Enjoy premium features.');
     } else {
       Alert.alert('Upgraded!', 'You now have access to all Pro features.', [
-        { text: 'OK', onPress: () => router.back() },
+        { text: 'OK', onPress: () => goBack() },
       ]);
     }
   };
@@ -47,7 +45,7 @@ export default function UpgradeScreen() {
       <View style={styles.header}>
         <Ionicons name="diamond" size={48} color={Colors.gold} />
         <Text style={styles.title}>
-          {isPro ? 'You\'re a Pro!' : 'Upgrade to Pro'}
+          {isPro ? "You're a Pro!" : 'Upgrade to Pro'}
         </Text>
         <Text style={styles.subtitle}>
           {isPro

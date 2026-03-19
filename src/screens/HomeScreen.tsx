@@ -5,19 +5,18 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
-  Image,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuthStore } from '../../src/stores/authStore';
-import { useUserStore } from '../../src/stores/userStore';
-import { useBookStore } from '../../src/stores/bookStore';
-import { TierBadge } from '../../src/components/TierBadge';
-import { BookCard } from '../../src/components/BookCard';
-import { Colors, Spacing, FontSizes, BorderRadius } from '../../src/constants/theme';
+import { useNavigation } from '../navigation/NavigationContext';
+import { useAuthStore } from '../stores/authStore';
+import { useUserStore } from '../stores/userStore';
+import { useBookStore } from '../stores/bookStore';
+import { TierBadge } from '../components/TierBadge';
+import { BookCard } from '../components/BookCard';
+import { Colors, Spacing, FontSizes, BorderRadius } from '../constants/theme';
 
 export default function HomeScreen() {
-  const router = useRouter();
+  const { navigate } = useNavigation();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const tier = useUserStore((s) => s.tier);
   const booksGenerated = useUserStore((s) => s.booksGenerated);
@@ -34,7 +33,7 @@ export default function HomeScreen() {
             <Text style={styles.heroTitle}>EbookMagic</Text>
             <Text style={styles.heroSubtitle}>AI Ebook Generator</Text>
           </View>
-          <TierBadge tier={tier} onUpgrade={() => router.push('/upgrade')} />
+          <TierBadge tier={tier} onUpgrade={() => navigate('upgrade')} />
         </View>
         <Text style={styles.heroDescription}>
           Create professional ebooks with AI-powered content and stunning covers.
@@ -44,7 +43,7 @@ export default function HomeScreen() {
         {!isAuthenticated ? (
           <Pressable
             style={styles.connectBtn}
-            onPress={() => router.push('/auth')}
+            onPress={() => navigate('auth')}
           >
             <Ionicons name="person-add" size={20} color="#FFF" />
             <Text style={styles.connectBtnText}>Sign Up Free</Text>
@@ -52,7 +51,7 @@ export default function HomeScreen() {
         ) : (
           <Pressable
             style={styles.createBtn}
-            onPress={() => router.push('/(tabs)/create')}
+            onPress={() => navigate('create')}
           >
             <Ionicons name="sparkles" size={20} color="#FFF" />
             <Text style={styles.createBtnText}>Create New Ebook</Text>
@@ -109,7 +108,7 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Books</Text>
-            <Pressable onPress={() => router.push('/(tabs)/library')}>
+            <Pressable onPress={() => navigate('library')}>
               <Text style={styles.seeAll}>See All</Text>
             </Pressable>
           </View>
@@ -117,7 +116,7 @@ export default function HomeScreen() {
             <BookCard
               key={book.id}
               book={book}
-              onPress={() => router.push(`/book/${book.id}`)}
+              onPress={() => navigate('book', { id: book.id })}
             />
           ))}
         </View>

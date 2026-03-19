@@ -5,8 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
-    "scheme": "ebookmagic",
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,7 +13,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ebookmagic.app"
+      "bundleIdentifier": "com.ebookmagic.app",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,18 +26,7 @@
       "package": "com.ebookmagic.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png",
-      "bundler": "metro",
-      "output": "single"
-    },
-    "plugins": [
-      "expo-router"
-    ],
-    "extra": {
-      "pollinationsApiKey": "${POLLINATIONS_API_KEY}",
-      "eas": {
-        "projectId": "ebookmagic"
-      }
+      "favicon": "./assets/favicon.png"
     }
   }
 }

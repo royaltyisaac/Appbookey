@@ -6,15 +6,14 @@ import {
   TextInput,
   Pressable,
   ScrollView,
-  Platform,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuthStore } from '../src/stores/authStore';
-import { Colors, Spacing, FontSizes, BorderRadius } from '../src/constants/theme';
+import { useNavigation } from '../navigation/NavigationContext';
+import { useAuthStore } from '../stores/authStore';
+import { Colors, Spacing, FontSizes, BorderRadius } from '../constants/theme';
 
 export default function AuthScreen() {
-  const router = useRouter();
+  const { goBack } = useNavigation();
   const { signUp, signIn, isAuthenticated } = useAuthStore();
   const [isSignUp, setIsSignUp] = useState(true);
   const [email, setEmail] = useState('');
@@ -48,7 +47,7 @@ export default function AuthScreen() {
       } else {
         await signIn(email, password);
       }
-      router.back();
+      goBack();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed');
     } finally {
@@ -65,7 +64,7 @@ export default function AuthScreen() {
           <Text style={styles.successSubtitle}>
             You're signed in and ready to create ebooks
           </Text>
-          <Pressable style={styles.doneBtn} onPress={() => router.back()}>
+          <Pressable style={styles.doneBtn} onPress={goBack}>
             <Text style={styles.doneBtnText}>Get Started</Text>
           </Pressable>
         </View>

@@ -8,14 +8,14 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useBookStore } from '../../src/stores/bookStore';
-import { BookCard } from '../../src/components/BookCard';
-import { Colors, Spacing, FontSizes, BorderRadius } from '../../src/constants/theme';
+import { useNavigation } from '../navigation/NavigationContext';
+import { useBookStore } from '../stores/bookStore';
+import { BookCard } from '../components/BookCard';
+import { Colors, Spacing, FontSizes, BorderRadius } from '../constants/theme';
 
 export default function LibraryScreen() {
-  const router = useRouter();
+  const { navigate } = useNavigation();
   const books = useBookStore((s) => s.books);
   const removeBook = useBookStore((s) => s.removeBook);
   const [filterGenre, setFilterGenre] = useState<string | null>(null);
@@ -101,7 +101,7 @@ export default function LibraryScreen() {
           </Text>
           <Pressable
             style={styles.createBtn}
-            onPress={() => router.push('/(tabs)/create')}
+            onPress={() => navigate('create')}
           >
             <Ionicons name="add-circle" size={20} color="#FFF" />
             <Text style={styles.createBtnText}>Create Ebook</Text>
@@ -112,7 +112,7 @@ export default function LibraryScreen() {
           <BookCard
             key={book.id}
             book={book}
-            onPress={() => router.push(`/book/${book.id}`)}
+            onPress={() => navigate('book', { id: book.id })}
             onDelete={() => handleDelete(book.id, book.title)}
           />
         ))

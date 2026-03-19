@@ -10,20 +10,20 @@ import {
   Image,
   Platform,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuthStore } from '../../src/stores/authStore';
-import { useUserStore } from '../../src/stores/userStore';
-import { useBookStore } from '../../src/stores/bookStore';
-import { GenerationProgressView } from '../../src/components/GenerationProgressView';
-import { generateEbook } from '../../src/services/ebookGenerator';
-import { getImageUrl } from '../../src/services/pollinations';
-import { GenerationConfig, GenerationProgress } from '../../src/types';
-import { GENRES, COVER_STYLES, TIER_CONFIG } from '../../src/constants/tiers';
-import { Colors, Spacing, FontSizes, BorderRadius } from '../../src/constants/theme';
+import { useNavigation } from '../navigation/NavigationContext';
+import { useAuthStore } from '../stores/authStore';
+import { useUserStore } from '../stores/userStore';
+import { useBookStore } from '../stores/bookStore';
+import { GenerationProgressView } from '../components/GenerationProgressView';
+import { generateEbook } from '../services/ebookGenerator';
+import { getImageUrl } from '../services/pollinations';
+import { GenerationConfig, GenerationProgress } from '../types';
+import { GENRES, COVER_STYLES, TIER_CONFIG } from '../constants/tiers';
+import { Colors, Spacing, FontSizes, BorderRadius } from '../constants/theme';
 
 export default function CreateScreen() {
-  const router = useRouter();
+  const { navigate } = useNavigation();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const tier = useUserStore((s) => s.tier);
   const canGenerate = useUserStore((s) => s.canGenerateBook);
@@ -66,7 +66,7 @@ export default function CreateScreen() {
   const handleGenerate = async () => {
     if (!isAuthenticated) {
       showAlert('Sign In Required', 'Please sign in to start generating ebooks.');
-      router.push('/auth');
+      navigate('auth');
       return;
     }
 
@@ -75,7 +75,7 @@ export default function CreateScreen() {
         'Limit Reached',
         'You have reached your book generation limit. Upgrade to Pro for unlimited books.',
       );
-      router.push('/upgrade');
+      navigate('upgrade');
       return;
     }
 
@@ -121,13 +121,12 @@ export default function CreateScreen() {
       setIsGenerating(false);
       setProgress(null);
 
-      // Reset form
       setTitle('');
       setAuthor('');
       setDescription('');
       setCoverPreviewUrl(null);
 
-      router.push(`/book/${book.id}`);
+      navigate('book', { id: book.id });
     } catch (error) {
       setProgress({
         stage: 'error',
@@ -268,7 +267,7 @@ export default function CreateScreen() {
               Free tier: max {TIER_CONFIG.free.maxPagesPerBook} pages with watermark.{' '}
               <Text
                 style={styles.upgradeLink}
-                onPress={() => router.push('/upgrade')}
+                onPress={() => navigate('upgrade')}
               >
                 Upgrade to Pro
               </Text>{' '}
@@ -346,7 +345,7 @@ export default function CreateScreen() {
           {tier === 'free' && (
             <Pressable
               style={[styles.modelCard, styles.modelCardLocked]}
-              onPress={() => router.push('/upgrade')}
+              onPress={() => navigate('upgrade')}
             >
               <Ionicons name="lock-closed" size={24} color={Colors.textMuted} />
               <Text style={styles.modelName}>GPT Image</Text>
@@ -391,7 +390,7 @@ export default function CreateScreen() {
       {!isAuthenticated && (
         <Pressable
           style={styles.authNotice}
-          onPress={() => router.push('/auth')}
+          onPress={() => navigate('auth')}
         >
           <Ionicons name="person" size={16} color={Colors.warning} />
           <Text style={styles.authNoticeText}>
