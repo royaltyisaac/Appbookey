@@ -8,17 +8,17 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuthStore } from '../../src/stores/authStore';
-import { useUserStore } from '../../src/stores/userStore';
-import { useBookStore } from '../../src/stores/bookStore';
-import { TierBadge } from '../../src/components/TierBadge';
-import { TIER_CONFIG } from '../../src/constants/tiers';
-import { Colors, Spacing, FontSizes, BorderRadius } from '../../src/constants/theme';
+import { useNavigation } from '../navigation/NavigationContext';
+import { useAuthStore } from '../stores/authStore';
+import { useUserStore } from '../stores/userStore';
+import { useBookStore } from '../stores/bookStore';
+import { TierBadge } from '../components/TierBadge';
+import { TIER_CONFIG } from '../constants/tiers';
+import { Colors, Spacing, FontSizes, BorderRadius } from '../constants/theme';
 
 export default function SettingsScreen() {
-  const router = useRouter();
+  const { navigate } = useNavigation();
   const { isAuthenticated, user, signOut } = useAuthStore();
   const { tier, booksGenerated } = useUserStore();
   const books = useBookStore((s) => s.books);
@@ -53,13 +53,13 @@ export default function SettingsScreen() {
         <View style={styles.card}>
           <View style={styles.cardRow}>
             <Text style={styles.cardLabel}>Tier</Text>
-            <TierBadge tier={tier} onUpgrade={() => router.push('/upgrade')} />
+            <TierBadge tier={tier} onUpgrade={() => navigate('upgrade')} />
           </View>
           <View style={styles.divider} />
           <View style={styles.cardRow}>
             <Text style={styles.cardLabel}>Books Generated</Text>
             <Text style={styles.cardValue}>
-              {booksGenerated} / {tierConfig.maxBooks === 999 ? '∞' : tierConfig.maxBooks}
+              {booksGenerated} / {tierConfig.maxBooks === 999 ? '\u221E' : tierConfig.maxBooks}
             </Text>
           </View>
           <View style={styles.divider} />
@@ -119,7 +119,7 @@ export default function SettingsScreen() {
         ) : (
           <Pressable
             style={styles.connectBtn}
-            onPress={() => router.push('/auth')}
+            onPress={() => navigate('auth')}
           >
             <Ionicons name="person" size={18} color="#FFF" />
             <Text style={styles.connectBtnText}>Sign In / Sign Up</Text>
@@ -149,7 +149,7 @@ export default function SettingsScreen() {
         {tier === 'free' && (
           <Pressable
             style={styles.upgradeBtn}
-            onPress={() => router.push('/upgrade')}
+            onPress={() => navigate('upgrade')}
           >
             <Ionicons name="diamond" size={18} color="#000" />
             <Text style={styles.upgradeBtnText}>Upgrade to Pro</Text>

@@ -10,17 +10,17 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import { useBookStore } from '../../src/stores/bookStore';
-import { generateBookHtml } from '../../src/services/ebookGenerator';
-import { Colors, Spacing, FontSizes, BorderRadius } from '../../src/constants/theme';
+import { useNavigation } from '../navigation/NavigationContext';
+import { useBookStore } from '../stores/bookStore';
+import { generateBookHtml } from '../services/ebookGenerator';
+import { Colors, Spacing, FontSizes, BorderRadius } from '../constants/theme';
 
 export default function BookReaderScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
+  const { params, goBack } = useNavigation();
+  const id = params.id as string;
   const book = useBookStore((s) => s.getBook(id || ''));
   const [currentChapter, setCurrentChapter] = useState(0);
   const [showToc, setShowToc] = useState(false);
@@ -31,7 +31,7 @@ export default function BookReaderScreen() {
       <View style={styles.errorContainer}>
         <Ionicons name="alert-circle" size={48} color={Colors.error} />
         <Text style={styles.errorText}>Book not found</Text>
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
+        <Pressable style={styles.backBtn} onPress={goBack}>
           <Text style={styles.backBtnText}>Go Back</Text>
         </Pressable>
       </View>
@@ -46,7 +46,6 @@ export default function BookReaderScreen() {
       const { uri } = await Print.printToFileAsync({ html });
 
       if (Platform.OS === 'web') {
-        // On web, trigger print dialog
         await Print.printAsync({ html });
       } else {
         const isAvailable = await Sharing.isAvailableAsync();
