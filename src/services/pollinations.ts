@@ -1,3 +1,5 @@
+import { getPollinationsApiKey } from '../config/api';
+
 const BASE_URL = 'https://gen.pollinations.ai';
 
 interface ChatMessage {
@@ -15,8 +17,8 @@ interface ChatCompletionResponse {
 
 export async function generateText(
   messages: ChatMessage[],
-  apiKey: string,
 ): Promise<string> {
+  const apiKey = getPollinationsApiKey();
   const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: {
@@ -45,9 +47,9 @@ export async function generateText(
 
 export async function generateTextStreaming(
   messages: ChatMessage[],
-  apiKey: string,
   onChunk: (text: string) => void,
 ): Promise<string> {
+  const apiKey = getPollinationsApiKey();
   const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: {
@@ -104,8 +106,8 @@ export function getImageUrl(
   model: 'flux' | 'gptimage' = 'flux',
   width: number = 800,
   height: number = 1200,
-  apiKey?: string,
 ): string {
+  const apiKey = getPollinationsApiKey();
   const encodedPrompt = encodeURIComponent(prompt);
   let url = `${BASE_URL}/image/${encodedPrompt}?model=${model}&width=${width}&height=${height}&quality=hd`;
   if (apiKey) {
@@ -117,8 +119,6 @@ export function getImageUrl(
 export async function generateCoverImage(
   prompt: string,
   model: 'flux' | 'gptimage',
-  apiKey: string,
 ): Promise<string> {
-  // Return the URL directly - the image endpoint returns JPEG via GET
-  return getImageUrl(prompt, model, 800, 1200, apiKey);
+  return getImageUrl(prompt, model, 800, 1200);
 }

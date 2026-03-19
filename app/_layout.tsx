@@ -8,14 +8,14 @@ import { useBookStore } from '../src/stores/bookStore';
 import { Colors } from '../src/constants/theme';
 
 export default function RootLayout() {
-  const loadApiKey = useAuthStore((s) => s.loadApiKey);
+  const loadUser = useAuthStore((s) => s.loadUser);
   const loadUserData = useUserStore((s) => s.loadUserData);
   const loadBooks = useBookStore((s) => s.loadBooks);
   const authLoading = useAuthStore((s) => s.isLoading);
   const userLoading = useUserStore((s) => s.isLoading);
 
   useEffect(() => {
-    loadApiKey();
+    loadUser();
     loadUserData();
     loadBooks();
   }, []);
@@ -46,7 +46,7 @@ export default function RootLayout() {
         />
         <Stack.Screen
           name="auth"
-          options={{ title: 'Connect API', presentation: 'modal' }}
+          options={{ title: 'Sign In', presentation: 'modal' }}
         />
         <Stack.Screen
           name="upgrade"

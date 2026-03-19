@@ -24,7 +24,6 @@ import { Colors, Spacing, FontSizes, BorderRadius } from '../../src/constants/th
 
 export default function CreateScreen() {
   const router = useRouter();
-  const apiKey = useAuthStore((s) => s.apiKey);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const tier = useUserStore((s) => s.tier);
   const canGenerate = useUserStore((s) => s.canGenerateBook);
@@ -52,9 +51,9 @@ export default function CreateScreen() {
   const previewCover = useCallback(() => {
     if (!title) return;
     const prompt = `Professional book cover, ${selectedCoverStyle} style, ${selectedGenre} genre, titled "${title}"`;
-    const url = getImageUrl(prompt, coverModel, 400, 600, apiKey || undefined);
+    const url = getImageUrl(prompt, coverModel, 400, 600);
     setCoverPreviewUrl(url);
-  }, [title, selectedCoverStyle, selectedGenre, coverModel, apiKey]);
+  }, [title, selectedCoverStyle, selectedGenre, coverModel]);
 
   const showAlert = (alertTitle: string, message: string) => {
     if (Platform.OS === 'web') {
@@ -65,8 +64,8 @@ export default function CreateScreen() {
   };
 
   const handleGenerate = async () => {
-    if (!isAuthenticated || !apiKey) {
-      showAlert('API Key Required', 'Please connect your Pollinations API key first.');
+    if (!isAuthenticated) {
+      showAlert('Sign In Required', 'Please sign in to start generating ebooks.');
       router.push('/auth');
       return;
     }
@@ -112,7 +111,6 @@ export default function CreateScreen() {
     try {
       const book = await generateEbook(
         config,
-        apiKey,
         hasWatermark(),
         (p) => setProgress(p),
       );
@@ -395,9 +393,9 @@ export default function CreateScreen() {
           style={styles.authNotice}
           onPress={() => router.push('/auth')}
         >
-          <Ionicons name="key" size={16} color={Colors.warning} />
+          <Ionicons name="person" size={16} color={Colors.warning} />
           <Text style={styles.authNoticeText}>
-            Connect your Pollinations API key to start generating
+            Sign in to start generating ebooks
           </Text>
         </Pressable>
       )}

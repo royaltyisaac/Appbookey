@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   TextInput,
   Pressable,
   ScrollView,
-  Linking,
   Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -14,50 +13,47 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../src/stores/authStore';
 import { Colors, Spacing, FontSizes, BorderRadius } from '../src/constants/theme';
 
-const POLLINATIONS_AUTH_URL = 'https://enter.pollinations.ai';
-
 export default function AuthScreen() {
   const router = useRouter();
-  const { setApiKey, isAuthenticated } = useAuthStore();
-  const [manualKey, setManualKey] = useState('');
+  const { signUp, signIn, isAuthenticated } = useAuthStore();
+  const [isSignUp, setIsSignUp] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Check for API key in URL hash (BYOP redirect)
-  useEffect(() => {
-    if (Platform.OS === 'web' && typeof window !== 'undefined') {
-      const hash = window.location.hash;
-      if (hash) {
-        const params = new URLSearchParams(hash.slice(1));
-        const key = params.get('api_key');
-        if (key) {
-          handleSetKey(key);
-          // Clean URL
-          window.history.replaceState(null, '', window.location.pathname);
-        }
-      }
-    }
-  }, []);
+  const handleSubmit = async () => {
+    setError('');
 
-  const handleSetKey = async (key: string) => {
-    if (!key.trim()) {
-      setError('Please enter a valid API key');
+    if (!email.trim() || !password.trim()) {
+      setError('Please fill in all fields');
       return;
     }
-    try {
-      await setApiKey(key.trim());
-      router.back();
-    } catch {
-      setError('Failed to save API key');
+
+    if (isSignUp && !displayName.trim()) {
+      setError('Please enter your name');
+      return;
     }
-  };
 
-  const handleBYOP = () => {
-    const redirectUrl = Platform.OS === 'web'
-      ? window.location.origin + window.location.pathname
-      : 'appbookey://auth';
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
 
-    const authUrl = `${POLLINATIONS_AUTH_URL}/authorize?redirect_url=${encodeURIComponent(redirectUrl)}`;
-    Linking.openURL(authUrl);
+    setLoading(true);
+    try {
+      if (isSignUp) {
+        await signUp(email, password, displayName);
+      } else {
+        await signIn(email, password);
+      }
+      router.back();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Authentication failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (isAuthenticated) {
@@ -65,12 +61,12 @@ export default function AuthScreen() {
       <View style={styles.container}>
         <View style={styles.successContainer}>
           <Ionicons name="checkmark-circle" size={64} color={Colors.success} />
-          <Text style={styles.successTitle}>Connected!</Text>
+          <Text style={styles.successTitle}>Welcome!</Text>
           <Text style={styles.successSubtitle}>
-            Your Pollinations API key is active
+            You're signed in and ready to create ebooks
           </Text>
           <Pressable style={styles.doneBtn} onPress={() => router.back()}>
-            <Text style={styles.doneBtnText}>Done</Text>
+            <Text style={styles.doneBtnText}>Get Started</Text>
           </Pressable>
         </View>
       </View>
@@ -80,77 +76,107 @@ export default function AuthScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Ionicons name="key" size={48} color={Colors.primary} />
-        <Text style={styles.title}>Connect API</Text>
+        <Ionicons name="book" size={48} color={Colors.primary} />
+        <Text style={styles.title}>
+          {isSignUp ? 'Create Account' : 'Welcome Back'}
+        </Text>
         <Text style={styles.subtitle}>
-          Connect your Pollinations API key to start generating ebooks
+          {isSignUp
+            ? 'Sign up to start generating professional ebooks'
+            : 'Sign in to your Appbookey account'}
         </Text>
       </View>
 
-      {/* BYOP Method */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Quick Connect (Recommended)</Text>
-        <Text style={styles.sectionDesc}>
-          Sign in with Pollinations and automatically get an API key. Uses the
-          Bring Your Own Pollen model — you pay for your own usage.
-        </Text>
-        <Pressable style={styles.byopBtn} onPress={handleBYOP}>
-          <Ionicons name="flash" size={20} color="#FFF" />
-          <Text style={styles.byopBtnText}>Connect with Pollinations</Text>
-        </Pressable>
-      </View>
+      <View style={styles.form}>
+        {isSignUp && (
+          <>
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Your name"
+              placeholderTextColor={Colors.textMuted}
+              value={displayName}
+              onChangeText={(text) => {
+                setDisplayName(text);
+                setError('');
+              }}
+              autoCapitalize="words"
+            />
+          </>
+        )}
 
-      <View style={styles.dividerRow}>
-        <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>OR</Text>
-        <View style={styles.dividerLine} />
-      </View>
-
-      {/* Manual Key Entry */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Manual Entry</Text>
-        <Text style={styles.sectionDesc}>
-          Enter your API key from{' '}
-          <Text
-            style={styles.link}
-            onPress={() => Linking.openURL(POLLINATIONS_AUTH_URL)}
-          >
-            enter.pollinations.ai
-          </Text>
-        </Text>
-
+        <Text style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
-          placeholder="sk_... or pk_..."
+          placeholder="you@example.com"
           placeholderTextColor={Colors.textMuted}
-          value={manualKey}
+          value={email}
           onChangeText={(text) => {
-            setManualKey(text);
+            setEmail(text);
             setError('');
           }}
+          keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
+        />
+
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="At least 6 characters"
+          placeholderTextColor={Colors.textMuted}
+          value={password}
+          onChangeText={(text) => {
+            setPassword(text);
+            setError('');
+          }}
           secureTextEntry
         />
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <Pressable
-          style={[styles.submitBtn, !manualKey && styles.submitBtnDisabled]}
-          onPress={() => handleSetKey(manualKey)}
-          disabled={!manualKey}
+          style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
+          onPress={handleSubmit}
+          disabled={loading}
         >
-          <Text style={styles.submitBtnText}>Connect</Text>
+          <Text style={styles.submitBtnText}>
+            {loading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.switchBtn}
+          onPress={() => {
+            setIsSignUp(!isSignUp);
+            setError('');
+          }}
+        >
+          <Text style={styles.switchText}>
+            {isSignUp
+              ? 'Already have an account? '
+              : "Don't have an account? "}
+            <Text style={styles.switchLink}>
+              {isSignUp ? 'Sign In' : 'Sign Up'}
+            </Text>
+          </Text>
         </Pressable>
       </View>
 
-      {/* Info */}
-      <View style={styles.infoCard}>
-        <Ionicons name="shield-checkmark" size={20} color={Colors.accent} />
-        <Text style={styles.infoText}>
-          Your API key is stored locally on your device and never sent to our
-          servers. It's only used to communicate directly with the Pollinations API.
-        </Text>
+      {/* Features */}
+      <View style={styles.featuresCard}>
+        <Text style={styles.featuresTitle}>What you get</Text>
+        {[
+          'AI-powered ebook generation',
+          'Professional cover art',
+          'PDF export & sharing',
+          'Free tier with 1 book included',
+        ].map((feature) => (
+          <View key={feature} style={styles.featureRow}>
+            <Ionicons name="checkmark-circle" size={16} color={Colors.success} />
+            <Text style={styles.featureText}>{feature}</Text>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
@@ -210,53 +236,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: Spacing.sm,
   },
-  section: {
+  form: {
     marginBottom: Spacing.lg,
   },
-  sectionTitle: {
-    fontSize: FontSizes.lg,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: Spacing.xs,
-  },
-  sectionDesc: {
+  label: {
     fontSize: FontSizes.md,
     color: Colors.textSecondary,
-    marginBottom: Spacing.md,
-    lineHeight: 22,
-  },
-  link: {
-    color: Colors.primary,
-    fontWeight: '600',
-  },
-  byopBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.sm,
-    backgroundColor: Colors.primary,
-    paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.md,
-  },
-  byopBtnText: {
-    color: '#FFF',
-    fontSize: FontSizes.lg,
-    fontWeight: '600',
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: Colors.border,
-  },
-  dividerText: {
-    color: Colors.textMuted,
-    fontSize: FontSizes.sm,
+    marginBottom: Spacing.xs,
   },
   input: {
     backgroundColor: Colors.surface,
@@ -274,31 +260,53 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   submitBtn: {
-    backgroundColor: Colors.surfaceHighlight,
+    backgroundColor: Colors.primary,
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.md,
     alignItems: 'center',
+    marginBottom: Spacing.md,
   },
   submitBtnDisabled: {
-    opacity: 0.5,
+    opacity: 0.6,
   },
   submitBtnText: {
-    color: Colors.text,
+    color: '#FFF',
     fontSize: FontSizes.lg,
     fontWeight: '600',
   },
-  infoCard: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-    backgroundColor: Colors.surfaceLight,
-    padding: Spacing.md,
-    borderRadius: BorderRadius.md,
-    alignItems: 'flex-start',
+  switchBtn: {
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
   },
-  infoText: {
-    flex: 1,
+  switchText: {
     color: Colors.textSecondary,
-    fontSize: FontSizes.sm,
-    lineHeight: 20,
+    fontSize: FontSizes.md,
+  },
+  switchLink: {
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  featuresCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  featuresTitle: {
+    fontSize: FontSizes.lg,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: Spacing.md,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.xs,
+  },
+  featureText: {
+    color: Colors.textSecondary,
+    fontSize: FontSizes.md,
   },
 });

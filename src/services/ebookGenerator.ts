@@ -9,7 +9,6 @@ function generateId(): string {
 
 async function generateOutline(
   config: GenerationConfig,
-  apiKey: string,
 ): Promise<{ chapters: { title: string; summary: string }[] }> {
   const prompt = `You are a professional book author. Create a detailed chapter outline for a ${config.genre} book.
 
@@ -27,10 +26,8 @@ Return ONLY a JSON object with this exact format, no other text:
 
   const response = await generateText(
     [{ role: 'user', content: prompt }],
-    apiKey,
   );
 
-  // Extract JSON from response
   const jsonMatch = response.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error('Failed to generate outline');
 
@@ -43,7 +40,6 @@ async function generateChapterContent(
   chapterSummary: string,
   chapterNumber: number,
   previousChapterSummaries: string[],
-  apiKey: string,
 ): Promise<string> {
   const wordsPerPage = 250;
   const targetWords = Math.floor(config.targetPages / config.chapterCount) * wordsPerPage;
@@ -71,7 +67,6 @@ Write the full chapter content now:`;
       },
       { role: 'user', content: prompt },
     ],
-    apiKey,
   );
 }
 
@@ -82,7 +77,6 @@ function estimatePageCount(text: string): number {
 
 export async function generateEbook(
   config: GenerationConfig,
-  apiKey: string,
   isWatermarked: boolean,
   onProgress: ProgressCallback,
 ): Promise<Book> {
@@ -97,7 +91,7 @@ export async function generateEbook(
     progress: 5,
   });
 
-  const outline = await generateOutline(config, apiKey);
+  const outline = await generateOutline(config);
 
   // Stage 2: Generate chapters
   const chapters: BookChapter[] = [];
@@ -121,7 +115,6 @@ export async function generateEbook(
       chapterInfo.summary,
       i + 1,
       chapterSummaries,
-      apiKey,
     );
 
     chapters.push({
@@ -147,7 +140,6 @@ export async function generateEbook(
   const coverUrl = await generateCoverImage(
     coverPrompt,
     config.coverModel,
-    apiKey,
   );
 
   // Stage 4: Finalize
@@ -248,65 +240,16 @@ export function generateBookHtml(book: Book): string {
       box-shadow: 0 20px 60px rgba(0,0,0,0.5);
       margin-bottom: 40px;
     }
-    .cover h1 {
-      font-size: 42px;
-      margin-bottom: 16px;
-      letter-spacing: 2px;
-    }
-    .cover .author {
-      font-size: 22px;
-      opacity: 0.8;
-      font-style: italic;
-    }
-    .cover .genre {
-      font-size: 14px;
-      opacity: 0.5;
-      margin-top: 20px;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-    }
-    .toc {
-      padding: 60px 40px;
-      max-width: 700px;
-      margin: 0 auto;
-      page-break-after: always;
-    }
-    .toc h2 {
-      font-size: 28px;
-      margin-bottom: 30px;
-      color: #1a1a2e;
-      border-bottom: 2px solid #6C63FF;
-      padding-bottom: 10px;
-    }
-    .toc-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px dotted #ccc;
-      font-size: 16px;
-    }
-    .chapter {
-      padding: 60px 40px;
-      max-width: 700px;
-      margin: 0 auto;
-      page-break-before: always;
-    }
-    .chapter h2 {
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      color: #6C63FF;
-      margin-bottom: 8px;
-    }
-    .chapter h3 {
-      font-size: 28px;
-      margin-bottom: 30px;
-      color: #1a1a2e;
-    }
-    .chapter-content {
-      font-size: 16px;
-      text-align: justify;
-    }
+    .cover h1 { font-size: 42px; margin-bottom: 16px; letter-spacing: 2px; }
+    .cover .author { font-size: 22px; opacity: 0.8; font-style: italic; }
+    .cover .genre { font-size: 14px; opacity: 0.5; margin-top: 20px; text-transform: uppercase; letter-spacing: 4px; }
+    .toc { padding: 60px 40px; max-width: 700px; margin: 0 auto; page-break-after: always; }
+    .toc h2 { font-size: 28px; margin-bottom: 30px; color: #1a1a2e; border-bottom: 2px solid #6C63FF; padding-bottom: 10px; }
+    .toc-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dotted #ccc; font-size: 16px; }
+    .chapter { padding: 60px 40px; max-width: 700px; margin: 0 auto; page-break-before: always; }
+    .chapter h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 3px; color: #6C63FF; margin-bottom: 8px; }
+    .chapter h3 { font-size: 28px; margin-bottom: 30px; color: #1a1a2e; }
+    .chapter-content { font-size: 16px; text-align: justify; }
     ${watermarkCss}
     @media print {
       .cover { page-break-after: always; }

@@ -19,25 +19,25 @@ import { Colors, Spacing, FontSizes, BorderRadius } from '../../src/constants/th
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { isAuthenticated, apiKey, clearApiKey } = useAuthStore();
+  const { isAuthenticated, user, signOut } = useAuthStore();
   const { tier, booksGenerated } = useUserStore();
   const books = useBookStore((s) => s.books);
 
   const tierConfig = TIER_CONFIG[tier];
 
-  const handleDisconnect = () => {
-    const doDisconnect = () => clearApiKey();
+  const handleSignOut = () => {
+    const doSignOut = () => signOut();
     if (Platform.OS === 'web') {
-      if (window.confirm('Disconnect API key? You can reconnect at any time.')) {
-        doDisconnect();
+      if (window.confirm('Sign out of your account?')) {
+        doSignOut();
       }
     } else {
       Alert.alert(
-        'Disconnect API',
-        'Disconnect your API key? You can reconnect at any time.',
+        'Sign Out',
+        'Sign out of your account?',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Disconnect', style: 'destructive', onPress: doDisconnect },
+          { text: 'Sign Out', style: 'destructive', onPress: doSignOut },
         ],
       );
     }
@@ -77,9 +77,9 @@ export default function SettingsScreen() {
         </View>
       </View>
 
-      {/* API Connection */}
+      {/* Account */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>API Connection</Text>
+        <Text style={styles.sectionTitle}>Your Account</Text>
         <View style={styles.card}>
           <View style={styles.cardRow}>
             <Text style={styles.cardLabel}>Status</Text>
@@ -91,35 +91,38 @@ export default function SettingsScreen() {
                 ]}
               />
               <Text style={styles.cardValue}>
-                {isAuthenticated ? 'Connected' : 'Not Connected'}
+                {isAuthenticated ? 'Signed In' : 'Not Signed In'}
               </Text>
             </View>
           </View>
-          {isAuthenticated && apiKey && (
+          {isAuthenticated && user && (
             <>
               <View style={styles.divider} />
               <View style={styles.cardRow}>
-                <Text style={styles.cardLabel}>API Key</Text>
-                <Text style={styles.cardValue}>
-                  {apiKey.slice(0, 6)}...{apiKey.slice(-4)}
-                </Text>
+                <Text style={styles.cardLabel}>Name</Text>
+                <Text style={styles.cardValue}>{user.displayName}</Text>
+              </View>
+              <View style={styles.divider} />
+              <View style={styles.cardRow}>
+                <Text style={styles.cardLabel}>Email</Text>
+                <Text style={styles.cardValue}>{user.email}</Text>
               </View>
             </>
           )}
         </View>
 
         {isAuthenticated ? (
-          <Pressable style={styles.disconnectBtn} onPress={handleDisconnect}>
-            <Ionicons name="unlink" size={18} color={Colors.error} />
-            <Text style={styles.disconnectBtnText}>Disconnect API Key</Text>
+          <Pressable style={styles.disconnectBtn} onPress={handleSignOut}>
+            <Ionicons name="log-out-outline" size={18} color={Colors.error} />
+            <Text style={styles.disconnectBtnText}>Sign Out</Text>
           </Pressable>
         ) : (
           <Pressable
             style={styles.connectBtn}
             onPress={() => router.push('/auth')}
           >
-            <Ionicons name="key" size={18} color="#FFF" />
-            <Text style={styles.connectBtnText}>Connect Pollinations API</Text>
+            <Ionicons name="person" size={18} color="#FFF" />
+            <Text style={styles.connectBtnText}>Sign In / Sign Up</Text>
           </Pressable>
         )}
       </View>

@@ -46,8 +46,8 @@ export default function HomeScreen() {
             style={styles.connectBtn}
             onPress={() => router.push('/auth')}
           >
-            <Ionicons name="key" size={20} color="#FFF" />
-            <Text style={styles.connectBtnText}>Connect Pollinations API</Text>
+            <Ionicons name="person-add" size={20} color="#FFF" />
+            <Text style={styles.connectBtnText}>Sign Up Free</Text>
           </Pressable>
         ) : (
           <Pressable
