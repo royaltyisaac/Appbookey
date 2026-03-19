@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "EbookMagic",
+    "slug": "ebookmagic",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "ebookmagic",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#120A1E"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ebookmagic.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#120A1E",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.ebookmagic.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "pollinationsApiKey": "${POLLINATIONS_API_KEY}",
+      "eas": {
+        "projectId": "ebookmagic"
+      }
+    }
+  }
+}
