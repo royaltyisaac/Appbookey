@@ -83,7 +83,7 @@ export default function AuthScreen() {
         <Text style={styles.subtitle}>
           {isSignUp
             ? 'Sign up to start generating professional ebooks'
-            : 'Sign in to your Appbookey account'}
+            : 'Sign in to your EbookMagic account'}
         </Text>
       </View>
 

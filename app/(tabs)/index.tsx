@@ -31,7 +31,7 @@ export default function HomeScreen() {
       <View style={styles.hero}>
         <View style={styles.heroTop}>
           <View>
-            <Text style={styles.heroTitle}>Appbookey</Text>
+            <Text style={styles.heroTitle}>EbookMagic</Text>
             <Text style={styles.heroSubtitle}>AI Ebook Generator</Text>
           </View>
           <TierBadge tier={tier} onUpgrade={() => router.push('/upgrade')} />

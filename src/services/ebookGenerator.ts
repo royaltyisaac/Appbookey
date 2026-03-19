@@ -182,13 +182,13 @@ export function generateBookHtml(book: Book): string {
   const watermarkCss = book.isWatermarked
     ? `
     .page::after {
-      content: 'APPBOOKEY FREE';
+      content: 'EBOOKMAGIC FREE';
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) rotate(-45deg);
       font-size: 80px;
-      color: rgba(108, 99, 255, 0.08);
+      color: rgba(155, 89, 182, 0.08);
       pointer-events: none;
       z-index: 1000;
       font-weight: bold;
@@ -227,7 +227,7 @@ export function generateBookHtml(book: Book): string {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      background: linear-gradient(135deg, #120A1E 0%, #1E1230 50%, #2A1B40 100%);
       color: white;
       text-align: center;
       padding: 40px 20px;
@@ -244,11 +244,11 @@ export function generateBookHtml(book: Book): string {
     .cover .author { font-size: 22px; opacity: 0.8; font-style: italic; }
     .cover .genre { font-size: 14px; opacity: 0.5; margin-top: 20px; text-transform: uppercase; letter-spacing: 4px; }
     .toc { padding: 60px 40px; max-width: 700px; margin: 0 auto; page-break-after: always; }
-    .toc h2 { font-size: 28px; margin-bottom: 30px; color: #1a1a2e; border-bottom: 2px solid #6C63FF; padding-bottom: 10px; }
+    .toc h2 { font-size: 28px; margin-bottom: 30px; color: #1E1230; border-bottom: 2px solid #9B59B6; padding-bottom: 10px; }
     .toc-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dotted #ccc; font-size: 16px; }
     .chapter { padding: 60px 40px; max-width: 700px; margin: 0 auto; page-break-before: always; }
-    .chapter h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 3px; color: #6C63FF; margin-bottom: 8px; }
-    .chapter h3 { font-size: 28px; margin-bottom: 30px; color: #1a1a2e; }
+    .chapter h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 3px; color: #9B59B6; margin-bottom: 8px; }
+    .chapter h3 { font-size: 28px; margin-bottom: 30px; color: #1E1230; }
     .chapter-content { font-size: 16px; text-align: justify; }
     ${watermarkCss}
     @media print {

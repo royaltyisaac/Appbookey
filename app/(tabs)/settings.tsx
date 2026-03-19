@@ -163,7 +163,7 @@ export default function SettingsScreen() {
         <View style={styles.card}>
           <View style={styles.cardRow}>
             <Text style={styles.cardLabel}>App</Text>
-            <Text style={styles.cardValue}>Appbookey</Text>
+            <Text style={styles.cardValue}>EbookMagic</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.cardRow}>

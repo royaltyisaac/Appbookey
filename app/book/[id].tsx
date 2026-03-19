@@ -71,7 +71,7 @@ export default function BookReaderScreen() {
     try {
       await Share.share({
         title: book.title,
-        message: `Check out "${book.title}" by ${book.author} - Generated with Appbookey!`,
+        message: `Check out "${book.title}" by ${book.author} - Generated with EbookMagic!`,
       });
     } catch {
       // User cancelled
@@ -182,7 +182,7 @@ export default function BookReaderScreen() {
 
           {/* Watermark overlay */}
           {book.isWatermarked && (
-            <Text style={styles.watermarkText}>APPBOOKEY FREE</Text>
+            <Text style={styles.watermarkText}>EBOOKMAGIC FREE</Text>
           )}
 
           <Text style={styles.chapterContent}>{chapter.content}</Text>
